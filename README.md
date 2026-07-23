@@ -49,4 +49,4 @@ Real scripts pulled from Become an Scammer Billionaire, in [samples/](samples/):
 
 ## Tools
 
-Luau, ProfileService, Node.js, Postgres. Comfortable with Git, Rojo, and most packages/frameworks - if your team uses it, I can work in it.
+Luau, Javascript, Node.js, Postgres. Comfortable with Git, Rojo, and most packages/frameworks - if your team uses it, I can work in it.
