@@ -4,7 +4,7 @@
 
 I write server-authoritative gameplay systems, data that never corrupts, and the analytics to prove what's working. Currently **open to part-time studio positions (30–40 hrs/week)**.
 
-📬 **Discord** `zriptic` · **Twitter/X** [@gradylau7](https://twitter.com/gradylau7) · **Roblox** [Zriptics](https://www.roblox.com/users/397380209/profile)
+📬 **Discord** `zriptic` · **Twitter/X** [@gradylau7](https://twitter.com/gradylau7) · **Roblox** [Zriptics](https://www.roblox.com/users/397380209/profile) · **GitHub** [@zriptic](https://github.com/zriptic)
 
 ---
 
