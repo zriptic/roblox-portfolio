@@ -36,17 +36,17 @@ Visit counts pulled July 2026.
 
 ## My games
 
-**[Become an Scammer Billionaire](https://www.roblox.com/games/80315788625581/Become-an-Scammer-Billionaire)** — built completely solo, launched June 2026. Honestly? It flopped. But go play it — the game itself is well made and polished, and it's the best public look at how I script. Every flop teaches you something the wins don't.
+**[Become an Scammer Billionaire](https://www.roblox.com/games/80315788625581/Become-an-Scammer-Billionaire)** - built completely solo, launched June 2026. It flopped, but the game itself is well made and polished, and it's the best public look at how I script.
 
 ## Code samples
 
-The code in [samples/](samples/) is how I actually write, not cleaned up for show:
+Some examples of how I write, in [samples/](samples/):
 
-- [Analytics.lua](samples/Analytics.lua) — the real SDK from my analytics platform. HTTP batching with retry, marketplace hooks, Studio guards, flush on shutdown
-- [DataService.lua](samples/DataService.lua) — ProfileService wrapper. Session-locked data, safe release, atomic spending so remotes can't dupe currency
-- [PlotService.lua](samples/PlotService.lua) — plot claiming and structure placement with everything validated server-side. The client asks, the server decides
-- [ObjectPool.lua](samples/ObjectPool.lua) — instance pooling for high-churn effects instead of hammering Instance.new
+- [Analytics.lua](samples/Analytics.lua) - the SDK from my analytics platform
+- [DataService.lua](samples/DataService.lua) - player data with ProfileService
+- [PlotService.lua](samples/PlotService.lua) - plot claiming and placement, checked server side
+- [ObjectPool.lua](samples/ObjectPool.lua) - instance pooling for effects
 
 ## Tools
 
-Luau, ProfileService, Node.js, Postgres. Comfortable with Git, Rojo, and most packages/frameworks — if your team uses it, I can work in it.
+Luau, ProfileService, Node.js, Postgres. Comfortable with Git, Rojo, and most packages/frameworks - if your team uses it, I can work in it.
