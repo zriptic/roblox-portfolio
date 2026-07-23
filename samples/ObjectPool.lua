@@ -1,76 +1,56 @@
---[[
-	ObjectPool
-	Reuse instances for high-churn effects (shell casings, debris, hit VFX)
-	instead of hammering Instance.new/Destroy every frame.
+-- ObjectPool
+-- Reuse instances for high churn effects instead of Instance.new/Destroy spam
 
-		local casingPool = ObjectPool.new(casingTemplate, 50)
-
-		local casing = casingPool:Get()
-		casing.CFrame = muzzle.CFrame
-		task.delay(2, function()
-			casingPool:Return(casing)
-		end)
-]]
+local ServerStorage = game:GetService("ServerStorage")
 
 local ObjectPool = {}
 ObjectPool.__index = ObjectPool
 
--- Pooled instances park here instead of nil-parenting, so physics and
--- rendering fully stop between uses.
-local storage = Instance.new("Folder")
-storage.Name = "_PoolStorage"
-storage.Parent = game:GetService("ServerStorage")
+local PoolStorage = Instance.new("Folder")
+PoolStorage.Name = "PoolStorage"
+PoolStorage.Parent = ServerStorage
 
-function ObjectPool.new(template, initialSize)
+function ObjectPool.new(template, startCount)
 	local self = setmetatable({
-		_template = template,
-		_available = {},
-		_inUse = {},
+		Template = template,
+		Available = {},
+		InUse = {},
 	}, ObjectPool)
-
-	for _ = 1, initialSize or 0 do
+	for _ = 1, startCount or 0 do
 		local instance = template:Clone()
-		instance.Parent = storage
-		table.insert(self._available, instance)
+		instance.Parent = PoolStorage
+		table.insert(self.Available, instance)
 	end
-
 	return self
 end
 
 function ObjectPool:Get()
-	local instance = table.remove(self._available)
-	if not instance then
-		instance = self._template:Clone() -- pool grows on demand
-	end
-
-	self._inUse[instance] = true
+	local instance = table.remove(self.Available) or self.Template:Clone()
+	self.InUse[instance] = true
 	instance.Parent = workspace
 	return instance
 end
 
 function ObjectPool:Return(instance)
-	if not self._inUse[instance] then
-		return -- already returned (or never ours) — double-Return is a no-op
-	end
-
-	self._inUse[instance] = nil
+	if not self.InUse[instance] then return end
+	self.InUse[instance] = nil
 	if instance:IsA("BasePart") then
 		instance.AssemblyLinearVelocity = Vector3.zero
 		instance.AssemblyAngularVelocity = Vector3.zero
 	end
-	instance.Parent = storage
-	table.insert(self._available, instance)
+	instance.Parent = PoolStorage
+	table.insert(self.Available, instance)
 end
 
 function ObjectPool:Destroy()
-	for _, instance in ipairs(self._available) do
+	for _, instance in ipairs(self.Available) do
 		instance:Destroy()
 	end
-	for instance in pairs(self._inUse) do
+	for instance in pairs(self.InUse) do
 		instance:Destroy()
 	end
-	table.clear(self._available)
-	table.clear(self._inUse)
+	table.clear(self.Available)
+	table.clear(self.InUse)
 end
 
 return ObjectPool
