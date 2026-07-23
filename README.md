@@ -40,12 +40,12 @@ Visit counts pulled July 2026.
 
 ## Code samples
 
-Some examples of how I write, in [samples/](samples/):
+Real scripts pulled from Become an Scammer Billionaire, in [samples/](samples/):
 
+- [GlobalStockService.lua](samples/GlobalStockService.lua) - cross server stock caps for limited shop items, receipt deduped so retried purchases can't double count
+- [EventService.lua](samples/EventService.lua) - global events that stay in sync on every server without them talking to each other
+- [CrateRoller.lua](samples/CrateRoller.lua) - crate rolls with luck upgrades, crates and dice share one reveal system
 - [Analytics.lua](samples/Analytics.lua) - the SDK from my analytics platform
-- [DataService.lua](samples/DataService.lua) - player data with ProfileService
-- [PlotService.lua](samples/PlotService.lua) - plot claiming and placement, checked server side
-- [ObjectPool.lua](samples/ObjectPool.lua) - instance pooling for effects
 
 ## Tools
 
