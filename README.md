@@ -47,8 +47,6 @@ The code in [samples/](samples/) is how I actually write, not cleaned up for sho
 - [PlotService.lua](samples/PlotService.lua) — plot claiming and structure placement with everything validated server-side. The client asks, the server decides
 - [ObjectPool.lua](samples/ObjectPool.lua) — instance pooling for high-churn effects instead of hammering Instance.new
 
-## How I build
+## Tools
 
-Server owns the truth, always. ProfileService for anything that can't be lost. Systems are data-driven so content doesn't mean new code. And if a mechanic matters, it gets a funnel step — I'd rather look at numbers than guess.
-
-Tools I use day to day: Luau, ProfileService, Node.js, Postgres, Railway, Git.
+Luau, ProfileService, Node.js, Postgres. Comfortable with Git, Rojo, and most packages/frameworks — if your team uses it, I can work in it.
