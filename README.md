@@ -32,6 +32,9 @@ Update and feature scripting across the studio's live portfolio:
 
 ## Personal Projects
 
+### 💸 Become an Scammer Billionaire — live, solo
+[Play it here](https://www.roblox.com/games/80315788625581/Become-an-Scammer-Billionaire) — designed, scripted, and shipped solo. **60K+ visits** since launching June 2026 and still climbing.
+
 ### 🟢 Roblox Live Analytics — full-stack, in production
 Roblox's official analytics lag 24–48 hours. I built my own real-time pipeline so I can watch sessions, CCU, funnels, and Robux live while a game is being played.
 
