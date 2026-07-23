@@ -1,17 +1,6 @@
---[[
-	Roblox Live Analytics SDK
-	Drop this ModuleScript into ServerScriptService and initialize once from a server Script:
-
-		local Analytics = require(game.ServerScriptService.Analytics)
-		Analytics.init({
-			endpoint = "https://your-app.up.railway.app",
-			key = "YOUR_GAME_API_KEY",
-			mirrorToRoblox = true, -- also log funnel steps to Roblox's own AnalyticsService
-		})
-
-	Requires "Allow HTTP Requests" in Game Settings > Security.
-	Everything is server-side only.
-]]
+-- Analytics
+-- Server side SDK for my live analytics platform, drop in ServerScriptService
+-- and call Analytics.init once. Needs HTTP requests enabled.
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
@@ -24,13 +13,11 @@ local Analytics = {}
 
 local config = nil
 local queue = {}
-local sessions = {} -- [userId] = { sessionId, startedAt }
-local productInfoCache = {} -- ["type_id"] = { price, name }
-local FLUSH_INTERVAL = 20
-local HEARTBEAT_INTERVAL = 30
-local MAX_BATCH = 400
-
--- ---------- internals ----------
+local sessions = {}
+local productInfoCache = {}
+local FlushEvery = 20
+local HeartbeatEvery = 30
+local MaxBatch = 400
 
 local function enqueue(eventType, userId, data)
 	if not config then return end
@@ -48,7 +35,7 @@ end
 local function flush()
 	if #queue == 0 or not config then return end
 	local batch = {}
-	for i = 1, math.min(#queue, MAX_BATCH) do
+	for i = 1, math.min(#queue, MaxBatch) do
 		batch[i] = queue[i]
 	end
 	local body = HttpService:JSONEncode({ gameKey = config.key, events = batch })
@@ -75,15 +62,11 @@ local function getProductInfo(id, infoType)
 	return { price = 0, name = "" }
 end
 
--- ---------- session tracking ----------
-
 local function onPlayerAdded(player)
 	local sessionId = HttpService:GenerateGUID(false)
 	sessions[player.UserId] = { sessionId = sessionId, startedAt = os.clock() }
 	task.spawn(function()
-		-- Country powers the Audience tab; the lookup yields so it runs
-		-- off the join path. Platform needs a client ping (Roblox exposes
-		-- no server-side device API) — "unknown" until that's added.
+		-- country lookup yields so it runs off the join path
 		local country = "unknown"
 		pcall(function()
 			country = LocalizationService:GetCountryRegionForPlayerAsync(player)
@@ -106,8 +89,6 @@ local function onPlayerRemoving(player)
 		sessions[player.UserId] = nil
 	end
 end
-
--- ---------- monetization hooks ----------
 
 local function hookMarketplace()
 	MarketplaceService.PromptProductPurchaseFinished:Connect(function(userId, productId, wasPurchased)
@@ -135,15 +116,11 @@ local function hookMarketplace()
 	end)
 end
 
--- ---------- public API ----------
-
 function Analytics.init(cfg)
 	assert(cfg and cfg.endpoint and cfg.key, "Analytics.init requires { endpoint, key }")
 	assert(config == nil, "Analytics.init called twice")
 
-	-- Live analytics only run in real servers: Studio playtests would pollute
-	-- sessions, retention and funnels with test data. config stays nil, so
-	-- every public function silently no-ops.
+	-- Studio playtests would pollute the stats, so everything no-ops there
 	if RunService:IsStudio() then
 		return
 	end
@@ -161,14 +138,14 @@ function Analytics.init(cfg)
 
 	task.spawn(function()
 		while true do
-			task.wait(HEARTBEAT_INTERVAL)
+			task.wait(HeartbeatEvery)
 			enqueue("heartbeat", nil, { playerCount = #Players:GetPlayers() })
 		end
 	end)
 
 	task.spawn(function()
 		while true do
-			task.wait(FLUSH_INTERVAL)
+			task.wait(FlushEvery)
 			flush()
 		end
 	end)
@@ -181,15 +158,13 @@ function Analytics.init(cfg)
 	end)
 end
 
---- Custom event: Analytics.track("egg_hatched", player, { egg = "legendary" })
 function Analytics.track(eventName, player, data)
 	data = data or {}
 	data.name = eventName
 	enqueue("custom", player and player.UserId or nil, data)
 end
 
---- One-time onboarding funnel (mirrors AnalyticsService:LogOnboardingFunnelStepEvent).
---- Server dedupes per player, so calling repeatedly is safe.
+-- one time onboarding funnel, server dedupes so calling repeatedly is safe
 function Analytics.logOnboardingStep(player, step, stepName)
 	enqueue("onboarding_step", player.UserId, {
 		funnelName = "Onboarding", step = step, stepName = stepName,
@@ -201,8 +176,7 @@ function Analytics.logOnboardingStep(player, step, stepName)
 	end
 end
 
---- Repeatable funnel (mirrors AnalyticsService:LogFunnelStepEvent).
---- funnelSessionId groups one pass through the funnel (e.g. one shop visit).
+-- repeatable funnel, funnelSessionId groups one pass through it
 function Analytics.logFunnelStep(player, funnelName, funnelSessionId, step, stepName)
 	enqueue("funnel_step", player.UserId, {
 		funnelName = funnelName, funnelSessionId = funnelSessionId,
@@ -215,8 +189,7 @@ function Analytics.logFunnelStep(player, funnelName, funnelSessionId, step, step
 	end
 end
 
---- Call this one line from your existing ProcessReceipt handler (ground truth for dev products):
----   Analytics.trackReceipt(receiptInfo)
+-- call from your ProcessReceipt handler
 function Analytics.trackReceipt(receiptInfo)
 	enqueue("receipt", receiptInfo.PlayerId, {
 		productId = receiptInfo.ProductId,
@@ -225,7 +198,6 @@ function Analytics.trackReceipt(receiptInfo)
 	})
 end
 
---- Generate a funnel session id (convenience wrapper).
 function Analytics.newFunnelSession()
 	return HttpService:GenerateGUID(false)
 end

@@ -1,3 +1,6 @@
+-- EventService
+-- Global events, every server picks the same event from a seeded cycle
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -22,8 +25,7 @@ local MessagingTopic = "EventOverride"
 
 local rng = Random.new()
 
--- Players with less session time than this are guaranteed at least one strike
--- per event: their plots are targeted first and skip the StrikeChance roll.
+-- new players are guaranteed a strike per event
 local NewPlayerSeconds = 29 * 60
 
 local joinTimes = {}
@@ -45,11 +47,10 @@ end
 
 local EventService = {}
 
-local override = nil          -- { anchor = number, event = string }
-local running = nil           -- { name, cycleStart, endsAt, thread }
+local override = nil
+local running = nil
 local started = false
 
--- Pick the event for a given cycle (forced on the override's own cycle, else seeded random)
 local function pickEventForCycle(anchor, cycleIndex, forced)
 	if forced and cycleIndex == 0 then
 		return EventConfig.Resolve(forced)
@@ -97,7 +98,6 @@ local function pickUnit(units)
 	return units[#units]
 end
 
--- Tell the unit's owner (rich text) when their character gets charmed.
 local function notifyOwner(npc, cfg)
 	local owner = npc.ownerId and Players:GetPlayerByUserId(npc.ownerId)
 	if not owner then return end
@@ -120,9 +120,7 @@ local function doStrike(eventName, cfg)
 	local units = getEligibleUnits(eventName, running.struckPlots)
 	if #units == 0 then return end
 
-	-- New-player guarantee: while any of their plots are still unstruck this
-	-- event, target those first and skip the chance roll. Once struck, the plot
-	-- lands in struckPlots and the remaining ticks behave normally.
+	-- new players get hit first and skip the chance roll
 	local newPlayerUnits = {}
 	for _, unit in ipairs(units) do
 		if isNewPlayer(unit.plot:GetAttribute("OwnerId")) then
@@ -155,7 +153,6 @@ local function startEvent(eventName, cycleStart, endsAt)
 	running = { name = eventName, cycleStart = cycleStart, endsAt = endsAt, struckCount = 0, struckPlots = {} }
 	Server.Fires("EventStarted", true, eventName, endsAt)
 
-	-- Quest credit for everyone in-session when the event kicks off.
 	for _, player in ipairs(Players:GetPlayers()) do
 		QuestService.AddProgress(player, "Event", 1)
 	end
@@ -190,7 +187,7 @@ local function refreshOverride()
 	end
 end
 
--- Fired by the Cmdr command. Re-anchors the cycle on every server.
+-- fired by the Cmdr command, re-anchors the cycle on every server
 function EventService.ManualFire(eventName)
 	local resolved = EventConfig.Resolve(eventName)
 	if not resolved then return false end
@@ -240,7 +237,7 @@ function EventService.Start()
 	end)
 	refreshOverride()
 
-	-- Late joiners ask for the current event state
+	-- late joiners ask for the current event state
 	Server.Connect("RequestEventState", function(player)
 		if running then
 			Server.Fire("EventStarted", true, player, running.name, running.endsAt)

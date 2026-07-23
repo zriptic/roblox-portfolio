@@ -1,8 +1,6 @@
 -- CrateRoller
--- Shared crate roll + grant logic, used by CrateService (gem crates) and
--- ShopPromptServer (Robux crates / Mystery Block). Results play through the
--- DICE REEL: the payload is fired as DiceRollResult so crates and dice share
--- one reveal system (reel + rare cinematics). Crate pools are character-only.
+-- Shared crate roll logic, crates and dice play through the same reveal reel
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
@@ -17,7 +15,7 @@ local UpgradesConfig = require(Modules:WaitForChild("UpgradesConfig"))
 local DataManager = require(ServerScriptService:WaitForChild("Modules"):WaitForChild("DataManager"))
 
 local Server = Warp.Server()
-Server.reg_namespaces({ "CrateResult" }) -- legacy namespace, kept so old client listeners don't warn
+Server.reg_namespaces({ "CrateResult" })
 
 local CrateRoller = {}
 
@@ -60,9 +58,7 @@ end
 
 CrateRoller.grantReward = grantReward
 
--- Rolls one reward from the crate (DiceLuck upgrade applies), grants it, and
--- fires the dice-reel reveal to the player.
--- Returns the reward (truthy) or false if the crate had nothing rollable.
+-- rolls a reward with luck applied, grants it, then fires the reel reveal
 function CrateRoller.spin(player, crate, revealDelay)
 	local luck = 1
 	local data = DataManager.Get(player)
