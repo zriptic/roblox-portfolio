@@ -34,15 +34,9 @@ Update and feature scripting on live games. Some titles I've worked on:
 
 Visit counts pulled July 2026.
 
-## My own projects
+## My games
 
-**[Become an Scammer Billionaire](https://www.roblox.com/games/80315788625581/Become-an-Scammer-Billionaire)** — made this one completely solo. 60k+ visits since it launched in June 2026.
-
-**Live analytics platform** — Roblox analytics take 24-48 hours to update, which drove me crazy, so I built my own. A Luau SDK ([samples/Analytics.lua](samples/Analytics.lua)) batches events to a Node.js + Postgres backend on Railway, and a dashboard shows CCU, sessions, purchases and funnels live with a 5 second refresh. One deployment handles all my games, and funnel calls mirror to Roblox's own AnalyticsService so both stay in sync.
-
-**BOOM BASE** — plot-based build-and-destroy game I'm working on right now.
-
-**Era Rebirth** — six-era tycoon (stone age to space). Everything is data-driven, so a new era is a config table, not another copy-pasted script.
+**[Become an Scammer Billionaire](https://www.roblox.com/games/80315788625581/Become-an-Scammer-Billionaire)** — built completely solo, launched June 2026. Honestly? It flopped. But go play it — the game itself is well made and polished, and it's the best public look at how I script. Every flop teaches you something the wins don't.
 
 ## Code samples
 
